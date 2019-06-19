@@ -124,9 +124,8 @@ def answer(inp):
     for tg in data["intents"]:
         if tg['tag'] == tag:
             responses = tg['responses']
-    answer = random.choice(responses)
     print(random.choice(responses))
-    return answer
+    return random.choice(responses)
 
 
 app = Flask(__name__)
@@ -143,7 +142,7 @@ class MedBotChat(Resource):
     def post(self):
         print(request.json['textCommand'])
         providerCommand = request.json['textCommand']
-        return {'status': answer(providerCommand)}
+        return answer(providerCommand)
 
 
 api.add_resource(MedBotChat, '/medBotChat')  # Route_1
