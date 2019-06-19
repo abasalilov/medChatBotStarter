@@ -138,12 +138,12 @@ class MedBotChat(Resource):
         print(request.json)
         # This line performs query and returns json result
         # Fetches first column that is Employee ID
-        return {'employees': answer("Hi")}
+        return {'employees': 'many'}
 
     def post(self):
-        print(request.json)
-        Answer = "yingling"
-        return {'status': Answer}
+        print(request.json['textCommand'])
+        providerCommand = request.json['textCommand']
+        return {'status': answer(providerCommand)}
 
 
 api.add_resource(MedBotChat, '/medBotChat')  # Route_1
