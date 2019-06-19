@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/al/Desktop/medChatBotStarter/model.tflearn"
+all_model_checkpoint_paths: "/Users/al/Desktop/medChatBotStarter/model.tflearn"
