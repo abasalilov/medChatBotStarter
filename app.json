@@ -1,0 +1,10 @@
+{
+  "apps": [
+    {
+      "name": "qq-fe",
+      "script": "npm run postbuild",
+      "watch": true,
+      "NODE_ENV": "production"
+    }
+  ]
+}
