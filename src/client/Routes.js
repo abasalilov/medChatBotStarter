@@ -8,7 +8,7 @@ export default [
     routes: [
       {
         ...HomePage,
-        path: "/home",
+        path: "/",
         exact: true
       },
       { ...VoicePage, path: "/VOICE-ACTIVATION", exact: true }
