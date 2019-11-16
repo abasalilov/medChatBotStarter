@@ -11,7 +11,7 @@ export default [
         path: "/home",
         exact: true
       },
-      { ...VoicePage, path: "/voice", exact: true }
+      { ...VoicePage, path: "/VOICE-ACTIVATION", exact: true }
     ]
   }
 ];

@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf build && rimraf public",
     "postclean": "npm-run-all --parallel prod:*",
-    "g": "npm-run-all --parallel dev:*",
+    "dev": "npm-run-all --parallel dev:*",
     "build": "NODE_ENV=production npm run clean",
     "prod:build-server": "webpack --config webpack.server.js ",
     "prod:build-client": "webpack --config webpack.client.js ",

@@ -1,7 +1,19 @@
 import React, { Component } from "react";
 import * as actions from "../../actions";
 import { connect } from "react-redux";
-import { TranscriberComponent } from "./Transcriber";
+import SpeechRecognition from "react-speech-recognition";
+import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Mic from "@material-ui/icons/Mic";
+import MicOff from "@material-ui/icons/MicOff";
+import Typography from "@material-ui/core/Typography";
+
+const iconStyle = {
+  color: "#1260DF !important",
+  fontSize: "3rem",
+  borderRadius: "50%",
+  border: "solid #1260DF 1px"
+};
 
 class Voice extends React.Component {
   constructor(props) {
@@ -12,10 +24,12 @@ class Voice extends React.Component {
       result: "",
       clicked: false
     };
+    this.startRecording = this.startRecording.bind(this);
+    this.stopRecording = this.stopRecording.bind(this);
   }
 
-  componentWillMount() {
-    // this.props.fetchResult();
+  componentDidMount() {
+    this.stopRecording();
   }
 
   onTranscription(source, recognized, transcribed) {
@@ -23,6 +37,14 @@ class Voice extends React.Component {
       recognized: this.state.recognized + recognized,
       transcribed: this.state.transcribed + transcribed
     });
+  }
+
+  startRecording() {
+    this.props.startListening();
+  }
+
+  stopRecording() {
+    this.props.stopListening();
   }
 
   clear() {
@@ -33,22 +55,8 @@ class Voice extends React.Component {
   }
 
   renderResults() {
-    const { medBot } = this.props;
-    const resArr = medBot.result.split(",");
-    console.log("resArr", resArr);
-    return (
-      <div>
-        Result:
-        {resArr.map(res => {
-          return res.length > 0 ? <li>{` ${res}`}</li> : "";
-        })}
-      </div>
-    );
-  }
-
-  handleClick() {
-    // this.setState({ clicked: true });
-    this.props.submitMedBotQuery(this.state.transcribed);
+    const { transcript } = this.props;
+    return <div>Result: `${transcript}`</div>;
   }
 
   handleSubmit(event) {
@@ -62,25 +70,56 @@ class Voice extends React.Component {
   }
 
   render() {
-    return (
-      <div>
+    const {
+      resetTranscript,
+      browserSupportsSpeechRecognition,
+      listening
+    } = this.props;
+    if (!browserSupportsSpeechRecognition) {
+      return (
         <div>
+          Voice Transcription Not Supported on this Browser, try Chrome.
+        </div>
+      );
+    }
+
+    return (
+      <div
+        style={{
+          marginTop: "8rem",
+          display: "flex",
+          justifyContent: "center"
+        }}
+      >
+        <div
+          style={{
+            width: "60rem"
+          }}
+        >
           <br />
-          <h6 style={{ color: "red", paddingTop: ".5em" }}>
-            Voice entry mode active now
-          </h6>
-          <div style={{ border: "2px solid" }}>
+          {listening ? (
+            <Typography
+              variant="h6"
+              align="left"
+              style={{ marginBottom: "2rem", color: "red" }}
+            >
+              Voice entry mode active now
+            </Typography>
+          ) : (
+            <Typography
+              variant="h6"
+              align="left"
+              style={{ marginBottom: "2rem", color: "#1260DF" }}
+            >
+              Voice entry mode inactive, click mic icon to begin.
+            </Typography>
+          )}
+          <div style={{ border: "2px solid #1260DF" }}>
             <p>
-              <label>Recognized:</label>
-              <span className="result">{this.state.recognized}</span>
-            </p>
-            <br /> <br />
-            <p>
-              <label>Transcribed:</label>
-              <span
-                className="result"
-                dangerouslySetInnerHTML={{ __html: this.state.transcribed }}
-              />
+              <Typography variant="h6" align="left" style={{ margin: "1rem" }}>
+                Transcribed :
+                <span className="result">{` ${this.props.transcript}`}</span>
+              </Typography>
             </p>
             <br /> <br />
           </div>
@@ -91,30 +130,24 @@ class Voice extends React.Component {
             <div
               style={{ width: "auto", color: "white", fontFamily: "Open Sans" }}
             >
-              <TranscriberComponent
-                id="phoneticTrans"
-                dataPath="/cmudict.json"
-                textStart="🎤 Begin Phonetic Transcription"
-                wrapUnknown="<%s>"
-                onTranscription={this.onTranscription.bind(this, "phonetic")}
-              />
+              <IconButton
+                aria-label="Toggle password Mic"
+                onClick={listening ? this.stopRecording : this.startRecording}
+                disableRipple={true}
+                style={{
+                  margin: "0 1rem 1rem 0"
+                }}
+              >
+                {listening ? (
+                  <MicOff style={iconStyle} />
+                ) : (
+                  <Mic style={iconStyle} />
+                )}
+              </IconButton>
+              ;
             </div>
             <br />
             <ul>
-              <button
-                onClick={this.handleClick.bind(this)}
-                style={{
-                  backgroundColor: "#5163EF",
-                  marginLeft: "40px",
-                  width: "90px",
-                  color: "white",
-                  fontFamily: "Open Sans",
-                  border: "solid grey 2px",
-                  textAlign: "center"
-                }}
-              >
-                Submit Query
-              </button>
               <button
                 style={{
                   marginLeft: "40px",
@@ -123,17 +156,16 @@ class Voice extends React.Component {
                   fontFamily: "Open Sans",
                   textAlign: "center"
                 }}
-                onClick={this.clear.bind(this)}
+                onClick={resetTranscript}
               >
-                × Clear
+                <Typography variant="h6" align="center">
+                  x Clear
+                </Typography>
               </button>
               <br />
             </ul>
           </div>
-          <br />
-          <br />
         </div>
-        {!this.props.medBot.result ? null : this.renderResults()}
       </div>
     );
   }
@@ -143,7 +175,5 @@ function mapStateToProps(state) {
   return { result: state.result, medBot: state.medBot };
 }
 
-export const VoiceComponent = connect(
-  mapStateToProps,
-  actions
-)(Voice);
+const WrappedVoice = SpeechRecognition(Voice);
+export const VoiceComponent = connect(mapStateToProps, actions)(WrappedVoice);
