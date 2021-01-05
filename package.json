@@ -26,7 +26,7 @@
     "@material-ui/icons": "^3.0.1",
     "@material-ui/pickers": "^3.2.7",
     "amortization": "^1.1.1",
-    "axios": "0.16.2",
+    "axios": "0.21.1",
     "babel-preset-env": "^1.7.0",
     "body-parser": "^1.18.3",
     "chart.js": "^2.8.0",
